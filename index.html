@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doubly Linked List Visualizer</title>
+<style>
+:root{--bg:#0f172a;--card:#111827;--card2:#1f2937;--text:#f8fafc;--muted:#cbd5e1;--main:#38bdf8;--green:#22c55e;--yellow:#facc15;--red:#fb7185;--purple:#a78bfa;--border:#334155;--code:#020617}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#020617,#0f172a,#111827);color:var(--text);line-height:1.7} header{padding:45px 18px;text-align:center;background:radial-gradient(circle at top,#1e293b,#020617)} header h1{font-size:42px;margin:0;color:var(--main)} header p{max-width:850px;margin:15px auto;color:var(--muted);font-size:18px}.container{width:min(1200px,94%);margin:auto}.card{background:rgba(17,24,39,.92);border:1px solid var(--border);border-radius:18px;padding:24px;margin:24px 0;box-shadow:0 15px 35px rgba(0,0,0,.25)}h2{color:var(--main);margin-top:0}h3{color:var(--purple)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.mini{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}.tag{display:inline-block;padding:4px 10px;border-radius:999px;background:#0ea5e933;color:#7dd3fc;border:1px solid #0ea5e9;margin:4px}.controls{display:flex;flex-wrap:wrap;gap:10px;margin:15px 0}.controls input,.controls select{background:#020617;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:12px}.controls button{border:none;border-radius:10px;padding:12px 14px;font-weight:bold;cursor:pointer;color:#020617;background:var(--main)}button.green{background:var(--green)}button.red{background:var(--red)}button.yellow{background:var(--yellow)}button.purple{background:var(--purple)}#canvasWrap{overflow-x:auto;padding:20px;background:#020617;border:1px solid var(--border);border-radius:16px;min-height:245px}.dll{display:flex;align-items:center;gap:12px;min-width:max-content}.node{position:relative;display:grid;grid-template-columns:55px 70px 55px;border:2px solid var(--main);border-radius:14px;overflow:hidden;background:#0b1220;box-shadow:0 8px 22px rgba(56,189,248,.12)}.node span{padding:13px 8px;text-align:center;border-right:1px solid var(--border);font-weight:bold}.node span:last-child{border-right:0}.node .data{background:#172554;color:#fff;font-size:22px}.label{position:absolute;top:-30px;font-size:12px;color:var(--yellow);left:50%;transform:translateX(-50%);white-space:nowrap}.arrow{font-size:30px;color:var(--muted);font-weight:bold}.null{border:1px dashed var(--red);color:var(--red);padding:8px 12px;border-radius:10px;font-weight:bold}.highlight{animation:pulse .7s infinite alternate;border-color:var(--yellow);box-shadow:0 0 25px rgba(250,204,21,.35)}@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.05)}}pre{background:var(--code);border:1px solid var(--border);border-radius:14px;padding:18px;overflow:auto;color:#e2e8f0}.comment{color:#94a3b8}.keyword{color:#93c5fd}.type{color:#c4b5fd}.num{color:#facc15}.output{background:#020617;border-left:5px solid var(--green);padding:14px;border-radius:12px;color:#d1fae5}.danger{color:var(--red);font-weight:bold}.success{color:var(--green);font-weight:bold}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}td,th{border:1px solid var(--border);padding:12px;text-align:left}th{background:#1e293b;color:var(--main)}footer{text-align:center;color:var(--muted);padding:30px}
+.quiz-card{background:#0b1220;border:1px solid var(--border);border-radius:16px;padding:18px;margin:18px 0}
+.quiz-card h3{margin-top:0;color:#e0f2fe}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px}.choice-btn{background:#1f2937;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:left;cursor:pointer;font-weight:bold;transition:.2s}.choice-btn:hover{transform:translateY(-2px);border-color:var(--main)}.choice-btn.correct{background:#14532d!important;border-color:var(--green)!important;color:#dcfce7}.choice-btn.wrong{background:#7f1d1d!important;border-color:var(--red)!important;color:#fee2e2}.explain{display:none;margin-top:12px;background:#020617;border-left:5px solid var(--main);padding:12px;border-radius:12px;color:#dbeafe}.scoreBox{background:#020617;border:1px solid var(--border);border-radius:14px;padding:14px;margin:15px 0;color:#d1fae5;font-weight:bold}
+
+.problem-card{background:#0b1220;border:1px solid var(--border);border-radius:16px;padding:18px;margin:18px 0}.problem-card h3{margin-top:0;color:#fef3c7}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#334155;color:#e2e8f0;font-size:12px;border:1px solid var(--border);margin:3px}.draw{font-family:Consolas,monospace;background:#020617;border:1px dashed var(--border);border-radius:12px;padding:12px;white-space:pre-wrap;overflow:auto;color:#dbeafe}.step-solution{display:none;margin-top:12px;background:#020617;border-left:5px solid var(--yellow);padding:14px;border-radius:12px}.show-btn{background:var(--yellow);color:#020617;border:none;border-radius:10px;padding:10px 14px;font-weight:bold;cursor:pointer;margin-top:10px}.small-code{font-family:Consolas,monospace;color:#bfdbfe;background:#020617;padding:2px 6px;border-radius:6px}
+.code-card{background:#0b1220;border:1px solid var(--border);border-radius:16px;padding:18px;margin:18px 0}.code-card h3{margin-top:0;color:#bbf7d0}.answer-code{display:none;margin-top:12px}.code-comment{color:var(--green);font-style:italic}.code-line{display:block;white-space:pre}.task-box{background:#020617;border-left:5px solid var(--purple);padding:12px;border-radius:12px;margin:10px 0;color:#e2e8f0}
+
+</style>
+</head>
+<body>
+<header><h1>Doubly Linked List Visualizer</h1><p>Explanation + interactive visualizer for Append, Insert, Delete, Search, Forward Display, and Reverse Display.</p></header>
+<main class="container">
+<section class="card"><h2>1) What is a Doubly Linked List?</h2><p>A <b>Doubly Linked List (DLL)</b> is a linked list where every node has three parts:</p><div class="grid"><div class="mini"><h3>prev</h3><p>Pointer to the previous node.</p></div><div class="mini"><h3>data</h3><p>The actual value stored inside the node.</p></div><div class="mini"><h3>next</h3><p>Pointer to the next node.</p></div></div><p>Because every node has <b>prev</b> and <b>next</b>, we can move forward from head to tail and backward from tail to head.</p></section>
+<section class="card"><h2>2) Important Pointers</h2><table><tr><th>Pointer</th><th>Meaning</th></tr><tr><td><b>head</b></td><td>Points to the first node.</td></tr><tr><td><b>tail</b></td><td>Points to the last node.</td></tr><tr><td><b>nullptr / NULL</b></td><td>Means the pointer points to nothing.</td></tr></table></section>
+<section class="card"><h2>3) Interactive Visualizer</h2><p class="muted">Try the same operations from the lab: Append, Insert by index, Delete by value, Search, Display, and Display from end.</p><div class="controls"><input id="value" type="number" placeholder="value e.g. 10"><input id="index" type="number" placeholder="index e.g. 2"><button class="green" onclick="appendNode()">Append</button><button onclick="insertNode()">Insert at Index</button><button class="red" onclick="deleteNode()">Delete Value</button><button class="yellow" onclick="searchNode()">Search</button><button class="purple" onclick="reverseDisplay()">Reverse Display</button><button onclick="resetList()">Reset</button></div><div id="canvasWrap"><div id="dll" class="dll"></div></div><div id="message" class="output">Start by appending values.</div></section>
+<section class="card"><h2>4) Operations Explained</h2><div class="grid"><div class="mini"><h3>Append(data)</h3><p>Adds a new node at the end. If list is empty, head and tail become the new node. Otherwise, link old tail to new node, then update tail.</p></div><div class="mini"><h3>Insert(data, index)</h3><p>Adds a new node before the node currently at that index. It must update four links: new prev, new next, previous next, and current prev.</p></div><div class="mini"><h3>Delete(data)</h3><p>Finds the node by value, then reconnects its previous and next nodes so the deleted node is skipped.</p></div><div class="mini"><h3>Search(data)</h3><p>Starts at head and moves using next until it finds the value or reaches NULL.</p></div><div class="mini"><h3>Display()</h3><p>Traverses from head to tail using next.</p></div><div class="mini"><h3>displayFromEnd()</h3><p>Traverses from tail to head using prev.</p></div></div></section>
+<section class="card"><h2>5) C++ Node and Class Structure</h2><pre><code><span class="keyword">struct</span> <span class="type">DLLNode</span>
+{
+    <span class="keyword">int</span> Data;              <span class="comment">// value stored in the node</span>
+    DLLNode* nextNode;     <span class="comment">// points to the next node</span>
+    DLLNode* prevNode;     <span class="comment">// points to the previous node</span>
+};
+
+<span class="keyword">class</span> <span class="type">DoublyLL</span>
+{
+<span class="keyword">private</span>:
+    DLLNode* head;         <span class="comment">// first node</span>
+    DLLNode* tail;         <span class="comment">// last node</span>
+<span class="keyword">public</span>:
+    <span class="type">DoublyLL</span>();
+    <span class="keyword">void</span> Append(<span class="keyword">int</span> data);
+    <span class="keyword">void</span> Insert(<span class="keyword">int</span> data, <span class="keyword">int</span> index);
+    <span class="keyword">void</span> Delete(<span class="keyword">int</span> data);
+    <span class="keyword">bool</span> Search(<span class="keyword">int</span> data);
+    <span class="keyword">void</span> Display();
+    <span class="keyword">void</span> displayFromEnd();
+    <span class="keyword">int</span> Size();
+};</code></pre></section>
+<section class="card"><h2>6) Insert Order: Very Important</h2><p>When inserting in the middle, do not lose the old links. Correct order:</p><pre><code>newNode-&gt;prevNode = current-&gt;prevNode; <span class="comment">// new points backward</span>
+newNode-&gt;nextNode = current;           <span class="comment">// new points forward</span>
+current-&gt;prevNode-&gt;nextNode = newNode; <span class="comment">// previous points to new</span>
+current-&gt;prevNode = newNode;           <span class="comment">// current points back to new</span></code></pre></section>
+<section class="card"><h2>7) Singly vs Doubly Linked List</h2><table><tr><th>Singly Linked List</th><th>Doubly Linked List</th></tr><tr><td>Each node has data + next.</td><td>Each node has prev + data + next.</td></tr><tr><td>Moves forward only.</td><td>Moves forward and backward.</td></tr><tr><td>Uses less memory.</td><td>Uses more memory because of prev pointer.</td></tr><tr><td>Harder to reverse traverse.</td><td>Reverse traversal is easy using tail and prev.</td></tr></table></section>
+<section class="card"><h2>8) Common Exam / Discussion Questions</h2><div class="mini"><b>Q: Why DLL uses more memory?</b><br>Because each node stores an extra pointer called prev.</div><br><div class="mini"><b>Q: Why is deletion easier in DLL?</b><br>Because the node already knows its previous node using prev.</div><br><div class="mini"><b>Q: What happens if head is NULL?</b><br>The list is empty.</div><br><div class="mini"><b>Q: Why do we need tail?</b><br>To append faster and traverse from the end.</div></section>
+
+<section class="card" id="theoryQuiz">
+<h2>9) 10 Theoretical Questions — Click and Check</h2>
+<p class="muted">Choose an answer. If it is correct, the button turns green. If it is wrong, it turns red, and the explanation appears.</p>
+<div class="scoreBox" id="quizScore">Score: 0 / 10</div>
+<div id="quizArea"></div>
+<button class="purple" onclick="resetQuiz()">Reset Quiz</button>
+</section>
+
+<section class="card" id="hardProblems">
+<h2>10) 10 Hard Long Problems — Detailed Steps + Drawings</h2>
+<p class="muted">These are exam-style tracing and solving problems. Choose one of the 4 answers. Correct answer turns green, wrong answer turns red, then the detailed steps appear.</p>
+<div class="scoreBox" id="problemScore">Problem Score: 0 / 10</div>
+<div id="problemsArea"></div>
+<button class="purple" onclick="resetProblems()">Reset Problems</button>
+</section>
+
+<section class="card" id="codingQuestions">
+<h2>11) 10 Coding-Based Questions — Full C++ Functions</h2>
+<p class="muted">Each task asks you to write an entire C++ function. Click “Show Answer” to reveal the full function. Every code statement is on its own line, and comments are green.</p>
+<div id="codingArea">
+
+<div class="code-card">
+<h3>1. Function: Count nodes in a Doubly Linked List</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">int DoublyLL::Size()</span> that returns the number of nodes in the list.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(0)">Show Answer</button>
+<div class="answer-code" id="code-answer-0"><pre><code><span class="code-line">int DoublyLL::Size()</span>
+<span class="code-line">{</span>
+<span class="code-line">    int counter = 0; <span class="code-comment">// Create a counter to count how many nodes exist.</span></span>
+<span class="code-line">    DLLNode* temp = head; <span class="code-comment">// Start traversal from the first node.</span></span>
+<span class="code-line">    while (temp != nullptr) <span class="code-comment">// Keep moving while we are still inside the list.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        counter++; <span class="code-comment">// Count the current node.</span></span>
+<span class="code-line">        temp = temp-&gt;nextNode; <span class="code-comment">// Move to the next node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    return counter; <span class="code-comment">// Return the total number of nodes.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>2. Function: Display nodes from head to tail</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::Display()</span> that prints all node values from the beginning to the end.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(1)">Show Answer</button>
+<div class="answer-code" id="code-answer-1"><pre><code><span class="code-line">void DoublyLL::Display()</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* temp = head; <span class="code-comment">// Start from the first node in the list.</span></span>
+<span class="code-line">    while (temp != nullptr) <span class="code-comment">// Continue until we pass the last node.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        cout &lt;&lt; temp-&gt;Data &lt;&lt; " "; <span class="code-comment">// Print the value stored in the current node.</span></span>
+<span class="code-line">        temp = temp-&gt;nextNode; <span class="code-comment">// Move forward using the next pointer.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>3. Function: Display nodes from tail to head</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::displayFromEnd()</span> that prints all values in reverse order.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(2)">Show Answer</button>
+<div class="answer-code" id="code-answer-2"><pre><code><span class="code-line">void DoublyLL::displayFromEnd()</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* temp = tail; <span class="code-comment">// Start from the last node in the list.</span></span>
+<span class="code-line">    while (temp != nullptr) <span class="code-comment">// Continue until we move before the first node.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        cout &lt;&lt; temp-&gt;Data &lt;&lt; " "; <span class="code-comment">// Print the value of the current node.</span></span>
+<span class="code-line">        temp = temp-&gt;prevNode; <span class="code-comment">// Move backward using the previous pointer.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>4. Function: Search for a value</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">bool DoublyLL::Search(int data)</span> that returns true if the value exists, otherwise false.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(3)">Show Answer</button>
+<div class="answer-code" id="code-answer-3"><pre><code><span class="code-line">bool DoublyLL::Search(int data)</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* temp = head; <span class="code-comment">// Start searching from the first node.</span></span>
+<span class="code-line">    while (temp != nullptr) <span class="code-comment">// Keep searching until the list ends.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        if (temp-&gt;Data == data) <span class="code-comment">// Check if the current node has the target value.</span></span>
+<span class="code-line">        {</span>
+<span class="code-line">            return true; <span class="code-comment">// Value found, so return true immediately.</span></span>
+<span class="code-line">        }</span>
+<span class="code-line">        temp = temp-&gt;nextNode; <span class="code-comment">// Move to the next node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    return false; <span class="code-comment">// The loop ended, so the value was not found.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>5. Function: Append a new node at the end</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::Append(int data)</span> that adds a new node after the current tail.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(4)">Show Answer</button>
+<div class="answer-code" id="code-answer-4"><pre><code><span class="code-line">void DoublyLL::Append(int data)</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* newNode = new DLLNode; <span class="code-comment">// Create a new node in dynamic memory.</span></span>
+<span class="code-line">    newNode-&gt;Data = data; <span class="code-comment">// Store the input value in the new node.</span></span>
+<span class="code-line">    newNode-&gt;nextNode = nullptr; <span class="code-comment">// The new node will be last, so its next is null.</span></span>
+<span class="code-line">    newNode-&gt;prevNode = tail; <span class="code-comment">// Its previous node is the old tail.</span></span>
+<span class="code-line">    if (head == nullptr) <span class="code-comment">// Check if the list is empty.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        head = newNode; <span class="code-comment">// In an empty list, head points to the new node.</span></span>
+<span class="code-line">        tail = newNode; <span class="code-comment">// In an empty list, tail also points to the new node.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop because insertion is complete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    tail-&gt;nextNode = newNode; <span class="code-comment">// Link the old tail to the new node.</span></span>
+<span class="code-line">    tail = newNode; <span class="code-comment">// Update tail to become the new node.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>6. Function: Insert at the head</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::InsertHead(int data)</span> that inserts a new node before the current head.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(5)">Show Answer</button>
+<div class="answer-code" id="code-answer-5"><pre><code><span class="code-line">void DoublyLL::InsertHead(int data)</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* newNode = new DLLNode; <span class="code-comment">// Create a new node.</span></span>
+<span class="code-line">    newNode-&gt;Data = data; <span class="code-comment">// Put the input value inside the node.</span></span>
+<span class="code-line">    newNode-&gt;prevNode = nullptr; <span class="code-comment">// New head has no previous node.</span></span>
+<span class="code-line">    newNode-&gt;nextNode = head; <span class="code-comment">// New node points forward to the old head.</span></span>
+<span class="code-line">    if (head == nullptr) <span class="code-comment">// If the list is empty, there is no old head.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        head = newNode; <span class="code-comment">// Head becomes the new node.</span></span>
+<span class="code-line">        tail = newNode; <span class="code-comment">// Tail also becomes the new node.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop after handling the empty list case.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    head-&gt;prevNode = newNode; <span class="code-comment">// Old head points backward to the new node.</span></span>
+<span class="code-line">    head = newNode; <span class="code-comment">// Update head to the new node.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>7. Function: Delete the first occurrence of a value</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::Delete(int data)</span> that deletes the first node containing the given value.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(6)">Show Answer</button>
+<div class="answer-code" id="code-answer-6"><pre><code><span class="code-line">void DoublyLL::Delete(int data)</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* temp = head; <span class="code-comment">// Start from the head to search for the value.</span></span>
+<span class="code-line">    while (temp != nullptr &amp;&amp; temp-&gt;Data != data) <span class="code-comment">// Move until value is found or list ends.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        temp = temp-&gt;nextNode; <span class="code-comment">// Go to the next node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (temp == nullptr) <span class="code-comment">// If temp is null, the value was not found.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        return; <span class="code-comment">// Nothing to delete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (temp == head) <span class="code-comment">// If deleting the first node.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        head = head-&gt;nextNode; <span class="code-comment">// Move head to the second node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (temp == tail) <span class="code-comment">// If deleting the last node.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        tail = tail-&gt;prevNode; <span class="code-comment">// Move tail to the previous node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (temp-&gt;prevNode != nullptr) <span class="code-comment">// If there is a node before temp.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        temp-&gt;prevNode-&gt;nextNode = temp-&gt;nextNode; <span class="code-comment">// Link previous node to next node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (temp-&gt;nextNode != nullptr) <span class="code-comment">// If there is a node after temp.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        temp-&gt;nextNode-&gt;prevNode = temp-&gt;prevNode; <span class="code-comment">// Link next node back to previous node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    delete temp; <span class="code-comment">// Free the deleted node from memory.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>8. Function: Insert before a given index</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::Insert(int data, int index)</span> that inserts a new node before the node currently at the given index.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(7)">Show Answer</button>
+<div class="answer-code" id="code-answer-7"><pre><code><span class="code-line">void DoublyLL::Insert(int data, int index)</span>
+<span class="code-line">{</span>
+<span class="code-line">    if (index &lt; 0 || index &gt; Size()) <span class="code-comment">// Check if the index is invalid.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        cout &lt;&lt; "Index out of bounds!" &lt;&lt; endl; <span class="code-comment">// Print an error message.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop the function.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (index == 0) <span class="code-comment">// If inserting at the beginning.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        InsertHead(data); <span class="code-comment">// Reuse the InsertHead function.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop because insertion is complete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (index == Size()) <span class="code-comment">// If inserting after the current last node.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        Append(data); <span class="code-comment">// Reuse the Append function.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop because insertion is complete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    DLLNode* current = head; <span class="code-comment">// Start from head to reach the required index.</span></span>
+<span class="code-line">    for (int i = 0; i &lt; index; i++) <span class="code-comment">// Move index times.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        current = current-&gt;nextNode; <span class="code-comment">// Move to the next node.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    DLLNode* newNode = new DLLNode; <span class="code-comment">// Create the new node.</span></span>
+<span class="code-line">    newNode-&gt;Data = data; <span class="code-comment">// Store the input value.</span></span>
+<span class="code-line">    newNode-&gt;prevNode = current-&gt;prevNode; <span class="code-comment">// New node points back to the node before current.</span></span>
+<span class="code-line">    newNode-&gt;nextNode = current; <span class="code-comment">// New node points forward to current.</span></span>
+<span class="code-line">    current-&gt;prevNode-&gt;nextNode = newNode; <span class="code-comment">// Previous node now points forward to new node.</span></span>
+<span class="code-line">    current-&gt;prevNode = newNode; <span class="code-comment">// Current node now points backward to new node.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>9. Function: Delete all even values</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::DeleteEven()</span> that removes every node whose value is even.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(8)">Show Answer</button>
+<div class="answer-code" id="code-answer-8"><pre><code><span class="code-line">void DoublyLL::DeleteEven()</span>
+<span class="code-line">{</span>
+<span class="code-line">    DLLNode* temp = head; <span class="code-comment">// Start checking from the first node.</span></span>
+<span class="code-line">    while (temp != nullptr) <span class="code-comment">// Continue until all nodes are checked.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        DLLNode* next = temp-&gt;nextNode; <span class="code-comment">// Save the next node before deleting anything.</span></span>
+<span class="code-line">        if (temp-&gt;Data % 2 == 0) <span class="code-comment">// Check if the current value is even.</span></span>
+<span class="code-line">        {</span>
+<span class="code-line">            if (temp == head) <span class="code-comment">// If the current node is the head.</span></span>
+<span class="code-line">            {</span>
+<span class="code-line">                head = temp-&gt;nextNode; <span class="code-comment">// Move head to the next node.</span></span>
+<span class="code-line">            }</span>
+<span class="code-line">            if (temp == tail) <span class="code-comment">// If the current node is the tail.</span></span>
+<span class="code-line">            {</span>
+<span class="code-line">                tail = temp-&gt;prevNode; <span class="code-comment">// Move tail to the previous node.</span></span>
+<span class="code-line">            }</span>
+<span class="code-line">            if (temp-&gt;prevNode != nullptr) <span class="code-comment">// If there is a previous node.</span></span>
+<span class="code-line">            {</span>
+<span class="code-line">                temp-&gt;prevNode-&gt;nextNode = temp-&gt;nextNode; <span class="code-comment">// Skip temp from the forward direction.</span></span>
+<span class="code-line">            }</span>
+<span class="code-line">            if (temp-&gt;nextNode != nullptr) <span class="code-comment">// If there is a next node.</span></span>
+<span class="code-line">            {</span>
+<span class="code-line">                temp-&gt;nextNode-&gt;prevNode = temp-&gt;prevNode; <span class="code-comment">// Skip temp from the backward direction.</span></span>
+<span class="code-line">            }</span>
+<span class="code-line">            delete temp; <span class="code-comment">// Delete the even node from memory.</span></span>
+<span class="code-line">        }</span>
+<span class="code-line">        temp = next; <span class="code-comment">// Continue traversal using the saved next pointer.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+<div class="code-card">
+<h3>10. Function: Insert using tail traversal</h3>
+<div class="task-box"><b>Task:</b> Write a C++ class method <span class="small-code">void DoublyLL::InsertReverse(int data, int index)</span> that starts from tail and inserts a node before the node at the given index.</div>
+<button class="show-btn" onclick="toggleCodeAnswer(9)">Show Answer</button>
+<div class="answer-code" id="code-answer-9"><pre><code><span class="code-line">void DoublyLL::InsertReverse(int data, int index)</span>
+<span class="code-line">{</span>
+<span class="code-line">    int size = Size(); <span class="code-comment">// Store the list size to avoid recalculating it many times.</span></span>
+<span class="code-line">    if (index &lt; 0 || index &gt; size) <span class="code-comment">// Check for an invalid index.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        cout &lt;&lt; "Index out of bounds!" &lt;&lt; endl; <span class="code-comment">// Print an error message.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop the function.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (index == 0) <span class="code-comment">// If insertion is at the beginning.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        InsertHead(data); <span class="code-comment">// Insert before the current head.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop because insertion is complete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    if (index == size) <span class="code-comment">// If insertion is at the end.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        Append(data); <span class="code-comment">// Add after the current tail.</span></span>
+<span class="code-line">        return; <span class="code-comment">// Stop because insertion is complete.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    DLLNode* current = tail; <span class="code-comment">// Start traversal from the tail.</span></span>
+<span class="code-line">    int counter = size - 1; <span class="code-comment">// Tail is located at index size - 1.</span></span>
+<span class="code-line">    while (counter &gt; index) <span class="code-comment">// Move backward until reaching the wanted index.</span></span>
+<span class="code-line">    {</span>
+<span class="code-line">        current = current-&gt;prevNode; <span class="code-comment">// Move one step toward the head.</span></span>
+<span class="code-line">        counter--; <span class="code-comment">// Decrease the index counter.</span></span>
+<span class="code-line">    }</span>
+<span class="code-line">    DLLNode* newNode = new DLLNode; <span class="code-comment">// Create the node to insert.</span></span>
+<span class="code-line">    newNode-&gt;Data = data; <span class="code-comment">// Store the input value.</span></span>
+<span class="code-line">    newNode-&gt;prevNode = current-&gt;prevNode; <span class="code-comment">// New node points back to current previous node.</span></span>
+<span class="code-line">    newNode-&gt;nextNode = current; <span class="code-comment">// New node points forward to current node.</span></span>
+<span class="code-line">    current-&gt;prevNode-&gt;nextNode = newNode; <span class="code-comment">// Previous node links forward to new node.</span></span>
+<span class="code-line">    current-&gt;prevNode = newNode; <span class="code-comment">// Current node links backward to new node.</span></span>
+<span class="code-line">}</span></code></pre></div>
+</div>
+
+</div>
+</section>
+
+</main><footer>Made for Doubly Linked List Lecture/Lab 6</footer>
+<script>
+let list=[10,25,3,6];
+function getVal(){const v=document.getElementById('value').value;return v===''?null:Number(v)}
+function getIdx(){const i=document.getElementById('index').value;return i===''?null:Number(i)}
+function msg(t){document.getElementById('message').innerHTML=t}
+function render(high=-1){const dll=document.getElementById('dll');dll.innerHTML=''; if(list.length===0){dll.innerHTML='<div class="null">head = tail = NULL</div>'; return;} dll.innerHTML+='<div class="null">NULL</div><div class="arrow">⇄</div>'; list.forEach((v,i)=>{const node=document.createElement('div');node.className='node '+(i===high?'highlight':''); let label=''; if(i===0)label='head'; if(i===list.length-1)label=label?label+' + tail':'tail'; node.innerHTML=`<div class="label">${label}</div><span>prev</span><span class="data">${v}</span><span>next</span>`; dll.appendChild(node); if(i<list.length-1){const a=document.createElement('div');a.className='arrow';a.textContent='⇄';dll.appendChild(a)}}); dll.innerHTML+='<div class="arrow">⇄</div><div class="null">NULL</div>'}
+function appendNode(){let v=getVal(); if(v===null)return msg('Enter a value first.'); list.push(v); render(list.length-1); msg(`<b>Append:</b> ${v} added at tail. tail now points to ${v}.`)}
+function insertNode(){let v=getVal(),i=getIdx(); if(v===null||i===null)return msg('Enter value and index.'); if(i<0||i>list.length)return msg('<span class="danger">Index out of bounds.</span>'); list.splice(i,0,v); render(i); msg(`<b>Insert:</b> ${v} inserted at index ${i}. Links were updated from both sides.`)}
+function deleteNode(){let v=getVal(); if(v===null)return msg('Enter value to delete.'); let i=list.indexOf(v); if(i===-1){render();return msg(`<span class="danger">${v} not found.</span>`)} list.splice(i,1); render(); msg(`<b>Delete:</b> ${v} removed. Previous and next nodes are reconnected.`)}
+function searchNode(){let v=getVal(); if(v===null)return msg('Enter value to search.'); let i=list.indexOf(v); render(i); msg(i===-1?`<span class="danger">Search result: ${v} not found.</span>`:`<span class="success">Search result: ${v} found at index ${i}.</span>`)}
+function reverseDisplay(){render(); msg(`<b>Reverse Display:</b> ${[...list].reverse().join(' ⇐ ') || 'Empty list'}`)}
+function resetList(){list=[];render();msg('List cleared. head = tail = NULL.')}
+render();
+
+const quizQuestions = [
+  {q:'1) What is the best definition of a data structure?', choices:['A way to organize and store data so operations can be done efficiently','Only a programming language command','Only a file saved on the computer','A type of CPU memory'], ans:0, exp:'A data structure is an organized way to store data and perform operations like insert, delete, search, and traverse.'},
+  {q:'2) In a Doubly Linked List, what does each node contain?', choices:['data only','data and next only','prev, data, and next','head and tail only'], ans:2, exp:'A DLL node has three parts: prev points to the previous node, data stores the value, and next points to the next node.'},
+  {q:'3) True or False: A doubly linked list can be traversed forward and backward.', choices:['True','False'], ans:0, exp:'True. Forward traversal uses next, and backward traversal uses prev, usually starting from tail.'},
+  {q:'4) What is the main disadvantage of a Doubly Linked List compared with a Singly Linked List?', choices:['It cannot delete nodes','It uses more memory because of the prev pointer','It cannot store integers','It cannot be traversed'], ans:1, exp:'DLL uses extra memory because every node stores an additional prev pointer.'},
+  {q:'5) Which operation is usually faster if we have a tail pointer?', choices:['Append at the end','Searching for any random value','Sorting the whole list','Deleting all nodes'], ans:0, exp:'With tail, we can directly reach the last node and append without traversing from head to the end.'},
+  {q:'6) Fill in the blank: Linear search checks elements ______.', choices:['by jumping to the middle every time','one by one until the value is found or the list ends','only after sorting the data','using a hashing formula only'], ans:1, exp:'Linear search scans elements sequentially, so it works on arrays and linked lists even if the data is not sorted.'},
+  {q:'7) Binary search requires the data to be ______.', choices:['unsorted','sorted','stored only in a DLL','stored only in a stack'], ans:1, exp:'Binary search works by repeatedly cutting the search range in half, so the data must be sorted.'},
+  {q:'8) Which sorting technique repeatedly compares adjacent elements and swaps them if they are in the wrong order?', choices:['Bubble Sort','Binary Search','Linear Search','Stack Push'], ans:0, exp:'Bubble Sort compares neighboring elements and swaps them until large/small values move to their correct side.'},
+  {q:'9) Which data structure follows FIFO?', choices:['Stack','Queue','Binary Search Tree','Doubly Linked List only'], ans:1, exp:'Queue follows FIFO: First In, First Out. The first item inserted is the first item removed.'},
+  {q:'10) What is an Abstract Data Type (ADT)?', choices:['A description of what operations a structure supports, without focusing on implementation details','A node that has no data','A type of syntax error','Only a C++ class name'], ans:0, exp:'An ADT focuses on behavior and operations, such as push/pop for stack or enqueue/dequeue for queue, not the exact code implementation.'}
+];
+let quizAnswered = Array(quizQuestions.length).fill(false);
+let quizScore = 0;
+function buildQuiz(){
+  const area=document.getElementById('quizArea'); if(!area) return;
+  area.innerHTML='';
+  quizQuestions.forEach((item,qi)=>{
+    const card=document.createElement('div'); card.className='quiz-card';
+    let html=`<h3>${item.q}</h3><div class="choices">`;
+    item.choices.forEach((c,ci)=>{ html += `<button class="choice-btn" onclick="checkQuiz(${qi},${ci},this)">${c}</button>`; });
+    html += `</div><div class="explain" id="explain-${qi}"><b>Explanation:</b> ${item.exp}</div>`;
+    card.innerHTML=html; area.appendChild(card);
+  });
+  updateQuizScore();
+}
+function checkQuiz(qi,ci,btn){
+  const item=quizQuestions[qi];
+  const card=btn.closest('.quiz-card');
+  const buttons=card.querySelectorAll('.choice-btn');
+  buttons.forEach(b=>b.disabled=true);
+  if(ci===item.ans){ btn.classList.add('correct'); if(!quizAnswered[qi]) quizScore++; }
+  else{ btn.classList.add('wrong'); buttons[item.ans].classList.add('correct'); }
+  quizAnswered[qi]=true;
+  document.getElementById(`explain-${qi}`).style.display='block';
+  updateQuizScore();
+}
+function updateQuizScore(){ const box=document.getElementById('quizScore'); if(box) box.textContent=`Score: ${quizScore} / ${quizQuestions.length}`; }
+function resetQuiz(){ quizScore=0; quizAnswered=Array(quizQuestions.length).fill(false); buildQuiz(); }
+buildQuiz();
+
+
+const hardProblems = [
+{
+ t:'Trace mixed DLL operations with head/tail changes',
+ tags:['Tracing','Append','Insert','Delete'],
+ q:`Start with empty DLL. Apply these operations:
+
+Append(10)
+Append(25)
+Append(3)
+Insert(18, index 2)
+Append(6)
+Insert(7, index 4)
+Delete(25)
+Delete(6)
+
+What is the final forward display?`,
+ choices:['10 18 3 7','10 25 18 3 7','18 3 7 10','10 18 7 3'],
+ ans:0,
+ exp:`<ol><li>Start: <div class="draw">head = NULL
+ tail = NULL</div></li><li>Append 10:<div class="draw">NULL ⇄ [10] ⇄ NULL
+head = 10
+ tail = 10</div></li><li>Append 25:<div class="draw">[10] ⇄ [25]</div></li><li>Append 3:<div class="draw">[10] ⇄ [25] ⇄ [3]</div></li><li>Insert 18 at index 2 means insert before current index 2, which is 3.<div class="draw">18.prev = 25
+18.next = 3
+25.next = 18
+3.prev = 18
+
+[10] ⇄ [25] ⇄ [18] ⇄ [3]</div></li><li>Append 6:<div class="draw">[10] ⇄ [25] ⇄ [18] ⇄ [3] ⇄ [6]</div></li><li>Insert 7 at index 4 means insert before 6:<div class="draw">[10] ⇄ [25] ⇄ [18] ⇄ [3] ⇄ [7] ⇄ [6]</div></li><li>Delete 25: connect 10 with 18:<div class="draw">10.next = 18
+18.prev = 10
+
+[10] ⇄ [18] ⇄ [3] ⇄ [7] ⇄ [6]</div></li><li>Delete 6: tail deletion. tail becomes 7 and 7.next becomes NULL.<div class="draw">[10] ⇄ [18] ⇄ [3] ⇄ [7]</div></li><li>Final forward display: <b class="success">10 18 3 7</b></li></ol>`
+},
+{
+ t:'Choose head traversal or tail traversal for insertion',
+ tags:['InsertReverse','Index'],
+ q:`Initial DLL:
+
+[4] ⇄ [9] ⇄ [12] ⇄ [20] ⇄ [33] ⇄ [41] ⇄ [50] ⇄ [60]
+
+Rule:
+if index < (Size - 1) / 2, traverse from head.
+otherwise, traverse from tail.
+
+Insert 99 at index 1.
+Then insert 77 at index 7.
+Then insert 88 at index 4.
+
+What is the final DLL?`,
+ choices:['4 99 9 12 88 20 33 41 77 50 60','4 99 9 12 20 88 33 41 77 50 60','99 4 9 12 88 20 33 41 77 50 60','4 9 99 12 88 20 33 77 41 50 60'],
+ ans:0,
+ exp:`<ol><li>Initial size = 8. Boundary = (8 - 1) / 2 = 3.</li><li>Index 1 is closer to head. Insert 99 before 9:<div class="draw">[4] ⇄ [99] ⇄ [9] ⇄ [12] ⇄ [20] ⇄ [33] ⇄ [41] ⇄ [50] ⇄ [60]</div></li><li>New size = 9. Boundary = 4. Index 7 is closer to tail. From tail: 60(index 8), then 50(index 7). Insert 77 before 50:<div class="draw">[4] ⇄ [99] ⇄ [9] ⇄ [12] ⇄ [20] ⇄ [33] ⇄ [41] ⇄ [77] ⇄ [50] ⇄ [60]</div></li><li>New size = 10. Boundary = 4. Index 4 uses tail because index is not less than 4. Traverse backward until current index 4, which is 20. Insert 88 before 20:<div class="draw">newNode.prev = 12
+newNode.next = 20
+12.next = 88
+20.prev = 88</div></li><li>Final:<div class="draw">[4] ⇄ [99] ⇄ [9] ⇄ [12] ⇄ [88] ⇄ [20] ⇄ [33] ⇄ [41] ⇄ [77] ⇄ [50] ⇄ [60]</div></li></ol>`
+},
+{
+ t:'Delete all nodes greater than X safely',
+ tags:['Delete by pointer','Traversal'],
+ q:`Initial DLL:
+
+[30] ⇄ [5] ⇄ [72] ⇄ [18] ⇄ [90] ⇄ [11] ⇄ [41]
+
+Delete all nodes greater than X = 40.
+
+What is the final DLL?`,
+ choices:['30 5 18 11','30 5 72 18 11','5 18 11 41','30 5 18 90 11'],
+ ans:0,
+ exp:`<ol><li>Important rule: save nextNode before deleting current node:<div class="draw">nextNode = ptr-&gt;nextNode
+if (ptr-&gt;Data &gt; X)
+    deleteNodeByPointer(ptr)
+ptr = nextNode</div></li><li>ptr = 30. Keep it.</li><li>ptr = 5. Keep it.</li><li>ptr = 72. Delete it. Connect 5 with 18:<div class="draw">5.next = 18
+18.prev = 5
+
+[30] ⇄ [5] ⇄ [18] ⇄ [90] ⇄ [11] ⇄ [41]</div></li><li>ptr = 18. Keep it.</li><li>ptr = 90. Delete it. Connect 18 with 11:<div class="draw">18.next = 11
+11.prev = 18
+
+[30] ⇄ [5] ⇄ [18] ⇄ [11] ⇄ [41]</div></li><li>ptr = 11. Keep it.</li><li>ptr = 41. Delete it. It is tail, so tail becomes 11:<div class="draw">tail = 11
+11.next = NULL</div></li><li>Final: <b class="success">30 5 18 11</b></li></ol>`
+},
+{
+ t:'Debug tail deletion bug',
+ tags:['Debugging','Pointers'],
+ q:`Buggy code:
+
+void Delete(int data)
+{
+    DLLNode* temp_nodeHolder = head;
+    DLLNode* tailHolder = tail;
+
+    if (tailHolder->Data == data)
+    {
+        tail = tailHolder->prevNode;
+        delete temp_nodeHolder;
+    }
+}
+
+Initial DLL:
+[10] ⇄ [20] ⇄ [30]
+
+Call Delete(30). What is the main bug?`,
+ choices:['It deletes head/temp_nodeHolder instead of deleting tailHolder','It cannot compare integers','It should use binary search','It inserts 30 again'],
+ ans:0,
+ exp:`<ol><li>At the beginning:<div class="draw">temp_nodeHolder = head
+therefore temp_nodeHolder points to 10
+
+tailHolder = tail
+therefore tailHolder points to 30</div></li><li>The condition tailHolder-&gt;Data == data is true because 30 == 30.</li><li>The code moves tail back to 20, but then deletes temp_nodeHolder. That means it deletes 10, not 30.</li><li>Correct code should be:<div class="draw">DLLNode* deleteMe = tail;
+tail = tail-&gt;prevNode;
+tail-&gt;nextNode = nullptr;
+delete deleteMe;</div></li><li>Correct final list:<div class="draw">[10] ⇄ [20]
+head = 10
+tail = 20</div></li></ol>`
+},
+{
+ t:'Search trace and why binary search is not suitable',
+ tags:['Search','Compare'],
+ q:`DLL:
+
+[14] ⇄ [3] ⇄ [29] ⇄ [8] ⇄ [21] ⇄ [5] ⇄ [17]
+
+Search for 21 using normal DLL traversal from head.
+
+How many comparisons are needed?`,
+ choices:['5 comparisons','4 comparisons','7 comparisons','2 comparisons'],
+ ans:0,
+ exp:`<ol><li>Start from head.</li><li>Compare 14 with 21: not equal.</li><li>Compare 3 with 21: not equal.</li><li>Compare 29 with 21: not equal.</li><li>Compare 8 with 21: not equal.</li><li>Compare 21 with 21: found.</li><li>Total comparisons = <b class="success">5</b>.</li><li>Why not binary search directly? Because binary search needs sorted data and fast middle access. A DLL does not have direct indexing like an array, so reaching the middle still needs traversal.</li></ol>`
+},
+{
+ t:'Trace displayFromEnd after insertions',
+ tags:['Reverse traversal','tail'],
+ q:`Start empty. Apply:
+
+Append(1)
+Append(2)
+Append(3)
+Append(4)
+Insert(10, index 0)
+Insert(20, index 3)
+Append(30)
+
+Then call displayFromEnd().
+
+What is the output?`,
+ choices:['30 4 3 20 2 1 10','10 1 2 20 3 4 30','30 20 4 3 2 1 10','4 3 20 2 1 10 30'],
+ ans:0,
+ exp:`<ol><li>After appends:<div class="draw">[1] ⇄ [2] ⇄ [3] ⇄ [4]</div></li><li>Insert 10 at index 0:<div class="draw">[10] ⇄ [1] ⇄ [2] ⇄ [3] ⇄ [4]</div></li><li>Insert 20 at index 3 means insert before current value 3:<div class="draw">[10] ⇄ [1] ⇄ [2] ⇄ [20] ⇄ [3] ⇄ [4]</div></li><li>Append 30:<div class="draw">[10] ⇄ [1] ⇄ [2] ⇄ [20] ⇄ [3] ⇄ [4] ⇄ [30]</div></li><li>displayFromEnd starts at tail and moves using prev:<div class="draw">30
+4
+3
+20
+2
+1
+10</div></li><li>Output: <b class="success">30 4 3 20 2 1 10</b></li></ol>`
+},
+{
+ t:'Build DLL then delete even values',
+ tags:['Create','Delete condition'],
+ q:`Create DLL by Append using:
+
+6
+13
+22
+7
+40
+9
+18
+5
+
+Then delete all even values.
+
+What are head and tail at the end?`,
+ choices:['head = 13, tail = 5','head = 6, tail = 5','head = 13, tail = 18','head = 7, tail = 5'],
+ ans:0,
+ exp:`<ol><li>Initial list:<div class="draw">[6] ⇄ [13] ⇄ [22] ⇄ [7] ⇄ [40] ⇄ [9] ⇄ [18] ⇄ [5]</div></li><li>Delete 6 because it is even. It is head, so head becomes 13:<div class="draw">head = 13
+13.prev = NULL</div></li><li>Delete 22. Connect 13 with 7:<div class="draw">13.next = 7
+7.prev = 13</div></li><li>Delete 40. Connect 7 with 9:<div class="draw">7.next = 9
+9.prev = 7</div></li><li>Delete 18. Connect 9 with 5:<div class="draw">9.next = 5
+5.prev = 9</div></li><li>Final list:<div class="draw">[13] ⇄ [7] ⇄ [9] ⇄ [5]</div></li><li>Final answer: <b class="success">head = 13, tail = 5</b></li></ol>`
+},
+{
+ t:'Bubble sort a DLL by swapping data',
+ tags:['Sorting','Bubble Sort'],
+ q:`Sort this DLL ascending using Bubble Sort by swapping data only:
+
+[7] ⇄ [2] ⇄ [9] ⇄ [1] ⇄ [5]
+
+What is the state after Pass 2?`,
+ choices:['2 1 5 7 9','1 2 5 7 9','2 7 1 5 9','7 2 1 5 9'],
+ ans:0,
+ exp:`<ol><li>Initial:<div class="draw">[7] ⇄ [2] ⇄ [9] ⇄ [1] ⇄ [5]</div></li><li>Pass 1:<div class="draw">Compare 7 and 2: swap → [2 7 9 1 5]
+Compare 7 and 9: no swap → [2 7 9 1 5]
+Compare 9 and 1: swap → [2 7 1 9 5]
+Compare 9 and 5: swap → [2 7 1 5 9]</div></li><li>Pass 2:<div class="draw">Compare 2 and 7: no swap → [2 7 1 5 9]
+Compare 7 and 1: swap → [2 1 7 5 9]
+Compare 7 and 5: swap → [2 1 5 7 9]</div></li><li>State after Pass 2: <b class="success">2 1 5 7 9</b></li></ol>`
+},
+{
+ t:'Insert into sorted DLL and keep order',
+ tags:['Sorted insertion','Pointers'],
+ q:`Sorted DLL:
+
+[4] ⇄ [11] ⇄ [19] ⇄ [27] ⇄ [35]
+
+Insert 1.
+Then insert 20.
+Then insert 40.
+
+What is the final sorted DLL?`,
+ choices:['1 4 11 19 20 27 35 40','4 1 11 19 20 27 35 40','1 4 11 20 19 27 35 40','1 4 11 19 27 20 35 40'],
+ ans:0,
+ exp:`<ol><li>Insert 1: it is smaller than head, so it becomes the new head:<div class="draw">1.next = 4
+4.prev = 1
+head = 1
+
+[1] ⇄ [4] ⇄ [11] ⇄ [19] ⇄ [27] ⇄ [35]</div></li><li>Insert 20: first node greater than 20 is 27, so insert before 27:<div class="draw">20.prev = 19
+20.next = 27
+19.next = 20
+27.prev = 20</div></li><li>List now:<div class="draw">[1] ⇄ [4] ⇄ [11] ⇄ [19] ⇄ [20] ⇄ [27] ⇄ [35]</div></li><li>Insert 40: it is greater than tail, so append at the end:<div class="draw">35.next = 40
+40.prev = 35
+40.next = NULL
+tail = 40</div></li><li>Final: <b class="success">1 4 11 19 20 27 35 40</b></li></ol>`
+},
+{
+ t:'Full exam trace with Size, head, tail, Display',
+ tags:['Full trace','Size'],
+ q:`Trace these lines:
+
+L.Append(12);
+L.Append(4);
+L.Append(19);
+L.Insert(8, 1);
+L.Insert(30, 3);
+L.Delete(12);
+L.Append(6);
+L.Delete(19);
+L.Insert(2, 0);
+L.Delete(100);
+
+What are Display(), displayFromEnd(), Size(), head, and tail?`,
+ choices:['Display: 2 8 4 30 6 | Reverse: 6 30 4 8 2 | Size=5 | head=2 | tail=6','Display: 8 4 30 6 | Reverse: 6 30 4 8 | Size=4 | head=8 | tail=6','Display: 2 8 4 19 30 6 | Reverse: 6 30 19 4 8 2 | Size=6 | head=2 | tail=6','Display: 12 8 4 30 6 | Reverse: 6 30 4 8 12 | Size=5 | head=12 | tail=6'],
+ ans:0,
+ exp:`<ol><li><div class="draw">L.Append(12);
+[12]</div></li><li><div class="draw">L.Append(4);
+[12] ⇄ [4]</div></li><li><div class="draw">L.Append(19);
+[12] ⇄ [4] ⇄ [19]</div></li><li><div class="draw">L.Insert(8, 1);
+[12] ⇄ [8] ⇄ [4] ⇄ [19]</div></li><li><div class="draw">L.Insert(30, 3);
+[12] ⇄ [8] ⇄ [4] ⇄ [30] ⇄ [19]</div></li><li><div class="draw">L.Delete(12);
+[8] ⇄ [4] ⇄ [30] ⇄ [19]</div></li><li><div class="draw">L.Append(6);
+[8] ⇄ [4] ⇄ [30] ⇄ [19] ⇄ [6]</div></li><li><div class="draw">L.Delete(19);
+[8] ⇄ [4] ⇄ [30] ⇄ [6]</div></li><li><div class="draw">L.Insert(2, 0);
+[2] ⇄ [8] ⇄ [4] ⇄ [30] ⇄ [6]</div></li><li><div class="draw">L.Delete(100);
+100 is not found, so no change.</div></li><li>Final answer:<div class="draw">Display() = 2 8 4 30 6
+displayFromEnd() = 6 30 4 8 2
+Size() = 5
+head = 2
+tail = 6</div></li></ol>`
+}
+];
+let problemAnswered = Array(hardProblems.length).fill(false);
+let problemScore = 0;
+function buildProblems(){
+ const area=document.getElementById('problemsArea'); if(!area) return;
+ area.innerHTML='';
+ hardProblems.forEach((p,i)=>{
+  const d=document.createElement('div'); d.className='problem-card';
+  let html=`<h3>${i+1}. ${p.t}</h3><div>${p.tags.map(x=>`<span class="pill">${x}</span>`).join('')}</div><div class="draw">${p.q}</div><div class="choices">`;
+  p.choices.forEach((c,ci)=>{ html += `<button class="choice-btn" onclick="checkProblem(${i},${ci},this)">${c}</button>`; });
+  html += `</div><div class="step-solution" id="problem-solution-${i}"><b>Detailed explanation:</b>${p.exp}</div>`;
+  d.innerHTML=html;
+  area.appendChild(d);
+ });
+ updateProblemScore();
+}
+function checkProblem(pi,ci,btn){
+ const p=hardProblems[pi];
+ const card=btn.closest('.problem-card');
+ const buttons=card.querySelectorAll('.choice-btn');
+ buttons.forEach(b=>b.disabled=true);
+ if(ci===p.ans){
+   btn.classList.add('correct');
+   if(!problemAnswered[pi]) problemScore++;
+ } else {
+   btn.classList.add('wrong');
+   buttons[p.ans].classList.add('correct');
+ }
+ problemAnswered[pi]=true;
+ document.getElementById(`problem-solution-${pi}`).style.display='block';
+ updateProblemScore();
+}
+function updateProblemScore(){
+ const box=document.getElementById('problemScore');
+ if(box) box.textContent=`Problem Score: ${problemScore} / ${hardProblems.length}`;
+}
+function resetProblems(){
+ problemScore=0;
+ problemAnswered=Array(hardProblems.length).fill(false);
+ buildProblems();
+}
+buildProblems();
+function toggleCodeAnswer(i){
+ const box=document.getElementById(`code-answer-${i}`);
+ if(!box) return;
+ box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+</script>
+</body>
+</html>
